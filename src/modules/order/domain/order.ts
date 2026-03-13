@@ -1,5 +1,5 @@
-import { CustomerId } from '../../../shared/domain/value-objects/customer-id.js';
 import { Money } from '../../../shared/domain/value-objects/money.js';
+import { Product } from '../../../shared/domain/value-objects/product.js';
 import { OrderLines } from './order-lines.js';
 import { OrderStatus } from './order-status.enum.js';
 import { OrderId } from './value-objects/order-id.js';
@@ -7,40 +7,42 @@ import { OrderId } from './value-objects/order-id.js';
 export class Order {
     private constructor(
         readonly orderId: OrderId,
-        readonly customerId: CustomerId,
         private orderLines: OrderLines,
         private status: OrderStatus,
         private price: Money,
         readonly createdAt: Date,
     ) {}
 
-    static draft(customerId: CustomerId, orderLines: OrderLines): Order {
+    static draft(orderLines: OrderLines): Order {
         if (orderLines.isEmpty()) {
             throw new Error('Cannot draft an order with no order lines');
         }
-        const orderId = new OrderId();
-        const price = orderLines.getTotalPrice();
-        return new Order(orderId, customerId, orderLines, OrderStatus.DRAFTED, price, new Date());
+        return new Order(new OrderId(), orderLines, OrderStatus.DRAFTED, orderLines.getTotalPrice(), new Date());
     }
 
     static reconstitute(
         orderId: OrderId,
-        customerId: CustomerId,
         orderLines: OrderLines,
         status: OrderStatus,
         price: Money,
         createdAt: Date,
     ): Order {
-        return new Order(orderId, customerId, orderLines, status, price, createdAt);
+        return new Order(orderId, orderLines, status, price, createdAt);
     }
 
     isEditable(): boolean {
         return this.status === OrderStatus.DRAFTED;
     }
 
+    private validateEditability(): void {
+        if (!this.isEditable()) {
+            throw new Error('Cannot modify a non-editable order');
+        }
+    }
+
     getPrice(): Money {
         if (this.isEditable()) {
-            return this.orderLines.getTotalPrice();
+            this.price = this.orderLines.getTotalPrice();
         }
         return this.price;
     }
@@ -51,6 +53,21 @@ export class Order {
 
     getOrderLines(): OrderLines {
         return this.orderLines;
+    }
+
+    addProduct(product: Product, quantity: number): void {
+        this.validateEditability();
+        this.orderLines = this.orderLines.addProduct(product, quantity);
+    }
+
+    changeProductQuantity(product: Product, quantity: number): void {
+        this.validateEditability();
+        this.orderLines = this.orderLines.changeQuantityOfProduct(product, quantity);
+    }
+
+    removeProduct(product: Product): void {
+        this.validateEditability();
+        this.orderLines = this.orderLines.removeProduct(product);
     }
 
     confirm(): void {
