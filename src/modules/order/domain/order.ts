@@ -6,7 +6,7 @@ import { OrderId } from './value-objects/order-id.js';
 
 export class Order {
     private constructor(
-        readonly orderId: OrderId,
+        readonly id: OrderId,
         private orderLines: OrderLines,
         private status: OrderStatus,
         private price: Money,
@@ -21,13 +21,13 @@ export class Order {
     }
 
     static reconstitute(
-        orderId: OrderId,
+        id: OrderId,
         orderLines: OrderLines,
         status: OrderStatus,
         price: Money,
         createdAt: Date,
     ): Order {
-        return new Order(orderId, orderLines, status, price, createdAt);
+        return new Order(id, orderLines, status, price, createdAt);
     }
 
     isEditable(): boolean {
