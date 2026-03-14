@@ -1,6 +1,6 @@
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { DomainEvent } from "../domain-events";
-import { Entity } from "../entities/entity.abstract";
+import { DomainEvent } from "./domain-event.abstract";
+import { Entity } from "./entity.abstract";
 
 /**
  * ## Aggregate

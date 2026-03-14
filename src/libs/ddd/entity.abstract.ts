@@ -1,4 +1,4 @@
-import { convertPropertiesToObject } from "../utils";
+import { convertPropertiesToObject } from "./utils";
 
 type EntityId<T> = string & { __brand: T };
 
