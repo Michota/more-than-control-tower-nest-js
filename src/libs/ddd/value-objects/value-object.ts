@@ -1,7 +1,7 @@
 import { ArgumentInvalidException, ArgumentNotProvidedException } from "@libs/exceptions";
 import { DisallowProperty } from "@libs/types";
 import { has, isEmpty } from "es-toolkit/compat";
-import { DomainPrimitive, DomainPrimitiveValue } from "./domain-primitive";
+import { DomainPrimitive, DomainPrimitiveValue, isDomainPrimitiveAbstract } from "./domain-primitive";
 
 type DisallowId<T> = DisallowProperty<T, "id">;
 
@@ -45,10 +45,7 @@ export abstract class ValueObject<T> {
     }
 
     private isDomainPrimitive(obj: unknown): obj is DomainPrimitive<T & DomainPrimitiveValue> {
-        if (Object.prototype.hasOwnProperty.call(obj, "value")) {
-            return true;
-        }
-        return false;
+        return isDomainPrimitiveAbstract<T>(obj);
     }
 
     /**
