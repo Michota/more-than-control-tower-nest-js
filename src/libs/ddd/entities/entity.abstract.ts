@@ -1,3 +1,5 @@
+import { convertPropertiesToObject } from "../utils";
+
 type EntityId<T> = string & { __brand: T };
 
 interface BaseEntityProps<T> {
@@ -42,21 +44,27 @@ export abstract class Entity<T> {
         return this._updatedAt;
     }
 
+    private getMutableProperties(): EntityProps<T> {
+        return Object.assign(
+            {
+                id: this.id,
+                createdAt: this.createdAt,
+                updatedAt: this.updatedAt,
+            },
+            { properties: this.properties },
+        );
+    }
+
     /**
      * Returns entity properties.
      * @memberof Entity
      */
     public getProperties(): EntityProps<T> {
-        return Object.freeze(
-            Object.assign(
-                {
-                    id: this.id,
-                    createdAt: this.createdAt,
-                    updatedAt: this.updatedAt,
-                },
-                { properties: this.properties },
-            ),
-        );
+        return Object.freeze(this.getMutableProperties());
+    }
+
+    public toObject(): unknown {
+        return Object.freeze(convertPropertiesToObject(this.getMutableProperties()));
     }
 
     static isEntity(entity: unknown): entity is Entity<unknown> {
