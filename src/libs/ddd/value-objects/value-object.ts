@@ -1,6 +1,6 @@
-import { ArgumentInvalidException } from "@libs/exceptions";
+import { ArgumentInvalidException, ArgumentNotProvidedException } from "@libs/exceptions";
 import { DisallowProperty } from "@libs/types";
-import { has } from "es-toolkit/compat";
+import { has, isEmpty } from "es-toolkit/compat";
 import { DomainPrimitive, DomainPrimitiveValue } from "./domain-primitive";
 
 type DisallowId<T> = DisallowProperty<T, "id">;
@@ -30,6 +30,12 @@ export abstract class ValueObject<T> {
         }
 
         return JSON.stringify(this) === JSON.stringify(vo);
+    }
+
+    private checkIfEmpty(props: ValueObjectProps<T>): void {
+        if (isEmpty(props) || (this.isDomainPrimitive(props) && isEmpty(props.value))) {
+            throw new ArgumentNotProvidedException("Property cannot be empty");
+        }
     }
 
     private isDomainPrimitive(obj: unknown): obj is DomainPrimitive<T & DomainPrimitiveValue> {
