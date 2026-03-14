@@ -3,7 +3,7 @@ type EntityId<T> = string & { __brand: T };
 export interface BaseEntityProps<T> {
     id: EntityId<T>;
     createdAt: Date;
-    updatedAt: Date;
+    updatedAt?: Date;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
