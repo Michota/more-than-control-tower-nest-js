@@ -5,15 +5,23 @@ import { DomainPrimitive, DomainPrimitiveValue } from "./domain-primitive";
 
 type DisallowId<T> = DisallowProperty<T, "id">;
 
-type ValueObjectProps<T> = DisallowId<T>;
+type ValueObjectProperties<T> = DisallowId<T>;
 
 export abstract class ValueObject<T> {
-    constructor(props: ValueObjectProps<T>) {
-        if (has(props, "id")) {
+    protected readonly properties: ValueObjectProperties<T>;
+
+    constructor(properties: ValueObjectProperties<T>) {
+        if (this.isEmpty(properties)) {
+            throw new ArgumentNotProvidedException("Property cannot be empty");
+        } else if (has(properties, "id")) {
             throw new ArgumentInvalidException(
                 `Value Objects are not capable of using 'id'! Are you sure you wanted to use ValueObject and not Entity?`,
             );
         }
+
+        this.validate(properties);
+
+        this.properties = properties;
     }
 
     static isValueObject(obj: unknown): obj is ValueObject<unknown> {
@@ -32,10 +40,8 @@ export abstract class ValueObject<T> {
         return JSON.stringify(this) === JSON.stringify(vo);
     }
 
-    private checkIfEmpty(props: ValueObjectProps<T>): void {
-        if (isEmpty(props) || (this.isDomainPrimitive(props) && isEmpty(props.value))) {
-            throw new ArgumentNotProvidedException("Property cannot be empty");
-        }
+    private isEmpty(props: ValueObjectProperties<T>): boolean {
+        return isEmpty(props) || (this.isDomainPrimitive(props) && isEmpty(props.value));
     }
 
     private isDomainPrimitive(obj: unknown): obj is DomainPrimitive<T & DomainPrimitiveValue> {
@@ -44,4 +50,9 @@ export abstract class ValueObject<T> {
         }
         return false;
     }
+
+    /**
+     * Throws error if the properties are invalid. Override this method to implement custom validation logic.
+     */
+    protected abstract validate(props: ValueObjectProperties<T>): void;
 }
