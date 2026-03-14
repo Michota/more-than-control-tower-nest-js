@@ -1,23 +1,29 @@
 type EntityId<T> = string & { __brand: T };
 
-export interface BaseEntityProps<T> {
+interface BaseEntityProps<T> {
     id: EntityId<T>;
     createdAt: Date;
     updatedAt?: Date;
 }
 
+export interface EntityProps<T> extends BaseEntityProps<T> {
+    properties: T;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface CreateEntityProps<T> extends BaseEntityProps<T> {}
+export interface CreateEntityProps<T> extends EntityProps<T> {}
 
 export abstract class Entity<T> {
     private _id: EntityId<T>;
     private _createdAt: Date;
     private _updatedAt?: Date;
+    protected readonly properties: T;
 
-    constructor({ id, createdAt, updatedAt }: CreateEntityProps<T>) {
+    constructor({ id, createdAt, updatedAt, properties }: CreateEntityProps<T>) {
         this._id = id;
         this._createdAt = createdAt || new Date();
         this._updatedAt = updatedAt;
+        this.properties = properties;
     }
 
     get id(): EntityId<T> {
@@ -34,6 +40,23 @@ export abstract class Entity<T> {
 
     get updatedAt(): Date | undefined {
         return this._updatedAt;
+    }
+
+    /**
+     * Returns entity properties.
+     * @memberof Entity
+     */
+    public getProperties(): EntityProps<T> {
+        return Object.freeze(
+            Object.assign(
+                {
+                    id: this.id,
+                    createdAt: this.createdAt,
+                    updatedAt: this.updatedAt,
+                },
+                { properties: this.properties },
+            ),
+        );
     }
 
     static isEntity(entity: unknown): entity is Entity<unknown> {
