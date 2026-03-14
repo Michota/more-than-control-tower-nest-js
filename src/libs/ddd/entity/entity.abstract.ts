@@ -59,4 +59,9 @@ export abstract class Entity<T> {
 
         return this.id ? this.id === object.id : false;
     }
+
+    /**
+     * Validate the entity's invariants. Should throw an error if validation fails.
+     */
+    public abstract validate(): void;
 }
