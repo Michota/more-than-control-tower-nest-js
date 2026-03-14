@@ -20,13 +20,7 @@ export class Order {
         return new Order(new OrderId(), orderLines, OrderStatus.DRAFTED, orderLines.getTotalPrice(), new Date());
     }
 
-    static reconstitute(
-        id: OrderId,
-        orderLines: OrderLines,
-        status: OrderStatus,
-        price: Money,
-        createdAt: Date,
-    ): Order {
+    static reconstitute({ id, orderLines, status, price, createdAt }: Order): Order {
         return new Order(id, orderLines, status, price, createdAt);
     }
 
