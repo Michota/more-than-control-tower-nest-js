@@ -52,4 +52,15 @@ export abstract class ValueObject<T> {
      * Throws error if the properties are invalid. Override this method to implement custom validation logic.
      */
     protected abstract validate(props: ValueObjectProperties<T>): void;
+
+    /**
+     * Get raw properties of an object.
+     */
+    public unpack(): T {
+        if (this.isDomainPrimitive(this.properties)) {
+            return this.properties.value;
+        }
+
+        return Object.freeze(this.properties) as T;
+    }
 }
