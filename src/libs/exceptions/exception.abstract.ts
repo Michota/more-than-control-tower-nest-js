@@ -1,4 +1,5 @@
 import { Except } from 'type-fest';
+import { ExceptionCode } from './exception.codes';
 
 type ExceptionMetadata = Record<any, any>;
 
@@ -8,8 +9,8 @@ export interface SerializedException extends Except<Error, 'name'> {
     metadata?: ExceptionMetadata;
 }
 
-export abstract class Exception extends Error {
-    abstract code: string;
+export abstract class Exception<T extends ExceptionCode | string = string> extends Error {
+    abstract code: T;
 
     constructor(
         readonly message: string,
