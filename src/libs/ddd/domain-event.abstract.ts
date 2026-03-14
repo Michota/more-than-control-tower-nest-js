@@ -4,7 +4,7 @@ import { isEmpty } from "es-toolkit/compat";
 import { BrandedId } from "../types";
 import { AggregateId } from "./aggregate-root.abstract";
 
-export type DomainEventId = BrandedId<"DomainEventId">;
+export type DomainEventId<T> = BrandedId<T, string>;
 
 type DomainEventMetadata = {
     /** Timestamp when this domain event occurred */
@@ -12,23 +12,24 @@ type DomainEventMetadata = {
 };
 
 export type DomainEventProperties<T> = Omit<T, "id" | "metadata"> & {
-    aggregateId: AggregateId;
+    // ? I am not should use this generic type with <T> or <unknown>.
+    aggregateId: AggregateId<T>;
     metadata?: DomainEventMetadata;
 };
 
-export abstract class DomainEvent {
-    public readonly id: DomainEventId;
+export abstract class DomainEvent<T> {
+    public readonly id: DomainEventId<T>;
 
     /** Aggregate ID where domain event occurred */
-    public readonly aggregateId: AggregateId;
+    public readonly aggregateId: AggregateId<T>;
 
     public readonly metadata: DomainEventMetadata;
 
-    private generateId(): DomainEventId {
-        return randomUUID() as DomainEventId;
+    private generateId(): DomainEventId<T> {
+        return randomUUID() as unknown as DomainEventId<T>;
     }
 
-    constructor(properties: DomainEventProperties<unknown>) {
+    constructor(properties: DomainEventProperties<T>) {
         if (isEmpty(properties)) {
             throw new ArgumentNotProvidedException("DomainEvent props should not be empty");
         }

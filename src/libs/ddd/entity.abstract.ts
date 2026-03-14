@@ -1,15 +1,19 @@
 import { BrandedId } from "../types";
 import { convertPropertiesToObject } from "./utils";
 
-export type EntityId = BrandedId<"entityId", string>;
+/*  UUID isn't used there because it can be generated outside of the entity,
+    and this outside-generated ID can be of any type (string, number, etc.).
+    The important part is that it's unique and immutable. 
+ */
+export type EntityId<T> = BrandedId<T, string>;
 
-interface BaseEntityProps {
-    id: EntityId;
+interface BaseEntityProps<T> {
+    id: EntityId<T>;
     createdAt: Date;
     updatedAt?: Date;
 }
 
-export interface EntityProps<T> extends BaseEntityProps {
+export interface EntityProps<T> extends BaseEntityProps<T> {
     properties: T;
 }
 
@@ -17,7 +21,7 @@ export interface EntityProps<T> extends BaseEntityProps {
 export interface CreateEntityProps<T> extends EntityProps<T> {}
 
 export abstract class Entity<T> {
-    private _id: EntityId;
+    private _id: EntityId<T>;
     private _createdAt: Date;
     private _updatedAt?: Date;
     protected readonly properties: T;
@@ -29,11 +33,11 @@ export abstract class Entity<T> {
         this.properties = properties;
     }
 
-    get id(): EntityId {
+    get id(): EntityId<T> {
         return this._id;
     }
 
-    private set id(newId: EntityId) {
+    private set id(newId: EntityId<T>) {
         this._id = newId;
     }
 

@@ -1,9 +1,8 @@
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { BrandedId } from "../types";
 import { DomainEvent } from "./domain-event.abstract";
-import { Entity } from "./entity.abstract";
+import { Entity, EntityId } from "./entity.abstract";
 
-export type AggregateId = BrandedId<"AggregateId">;
+export type AggregateId<T> = EntityId<T>;
 
 /**
  * ## Aggregate
@@ -31,14 +30,14 @@ export type AggregateId = BrandedId<"AggregateId">;
  *
  * Based on [this example](https://github.com/Sairyss/domain-driven-hexagon/tree/master?tab=readme-ov-file#aggregates).
  */
-export abstract class AggregateRoot<EntityProps> extends Entity<EntityProps> {
-    private _domainEvents: DomainEvent[] = [];
+export abstract class AggregateRoot<T> extends Entity<T> {
+    private _domainEvents: DomainEvent<T>[] = [];
 
-    get domainEvents(): DomainEvent[] {
+    get domainEvents(): DomainEvent<T>[] {
         return this._domainEvents;
     }
 
-    protected addEvent(domainEvent: DomainEvent): void {
+    protected addEvent(domainEvent: DomainEvent<T>): void {
         this._domainEvents.push(domainEvent);
     }
 
