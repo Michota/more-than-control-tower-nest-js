@@ -43,7 +43,6 @@ function generateMikroOrmOptions({
             path: "dist/migrations",
             pathTs: "src/database/migrations",
             generator: TSMigrationGenerator,
-            disableForeignKeys: false,
         },
     };
 }
