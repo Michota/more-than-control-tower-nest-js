@@ -11,6 +11,9 @@ importers:
       '@mikro-orm/core':
         specifier: ^7.0.2
         version: 7.0.2
+      '@mikro-orm/migrations':
+        specifier: ^7.0.2
+        version: 7.0.2(@mikro-orm/core@7.0.2)
       '@mikro-orm/nestjs':
         specifier: ^7.0.1
         version: 7.0.1(@mikro-orm/core@7.0.2)(@nestjs/common@11.1.16(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.16)(reflect-metadata@0.2.2)
@@ -655,6 +658,12 @@ packages:
     peerDependenciesMeta:
       dataloader:
         optional: true
+
+  '@mikro-orm/migrations@7.0.2':
+    resolution: {integrity: sha512-b1+dTm3O4BqojcxNPfJQiLPjOnN5CfrsRWAfjxI03eDiMDZ6sN4F4aMyw9ex5F5PzLfouCItstR9arI7hT/Qfw==}
+    engines: {node: '>= 22.17.0'}
+    peerDependencies:
+      '@mikro-orm/core': 7.0.2
 
   '@mikro-orm/nestjs@7.0.1':
     resolution: {integrity: sha512-0VWaGIsVLMI6XDrrblX5om5lyf4msjlRu405jtuUYQ+nULK+XU2gb2mvzo7UvYZd//eEoXtMlkY5oEykm5Hriw==}
@@ -3796,6 +3805,11 @@ snapshots:
   '@lukeed/csprng@1.1.0': {}
 
   '@mikro-orm/core@7.0.2': {}
+
+  '@mikro-orm/migrations@7.0.2(@mikro-orm/core@7.0.2)':
+    dependencies:
+      '@mikro-orm/core': 7.0.2
+      '@mikro-orm/sql': 7.0.2(@mikro-orm/core@7.0.2)
 
   '@mikro-orm/nestjs@7.0.1(@mikro-orm/core@7.0.2)(@nestjs/common@11.1.16(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.16)(reflect-metadata@0.2.2)':
     dependencies:
