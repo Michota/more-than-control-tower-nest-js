@@ -1,12 +1,11 @@
 import { MikroOrmModule } from "@mikro-orm/nestjs";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigType } from "@nestjs/config";
-import databaseConfig from "./config/database.config";
-import { generateMikroOrmOptions } from "./config/mikro-orm.config";
+import { databaseConfig, generateMikroOrmOptions, validate } from "@config/index";
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true, load: [databaseConfig] }),
+        ConfigModule.forRoot({ isGlobal: true, load: [databaseConfig], validate }),
         MikroOrmModule.forRootAsync({
             useFactory: (config: ConfigType<typeof databaseConfig>) => generateMikroOrmOptions(config),
             inject: [databaseConfig.KEY],
