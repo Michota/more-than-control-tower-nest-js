@@ -5,10 +5,11 @@ import { AggregateRoot } from "../../../libs/ddd/aggregate-root.abstract.js";
 import { type EntityProps } from "../../../libs/ddd/entities/entity.abstract.js";
 import { Money } from "../../../shared/value-objects/money.js";
 import { Product } from "../../../shared/value-objects/product.js";
+import { OrderDraftedDomainEvent } from "./events/order-drafted.domain-event.js";
 import { OrderCustomer } from "./order-customer.entity.js";
 import { OrderLines } from "./order-lines.value-object.js";
+import { CannotChangeQuantityOfPlacedOrderError, OrderHasOrderLinesWithoutItems } from "./order.errors.js";
 import { OrderStatus } from "./order.status.js";
-import { OrderDraftedDomainEvent } from "./events/order-drafted.domain-event.js";
 
 interface OrderProperties {
     cost: Money;
@@ -50,7 +51,7 @@ export class Order extends AggregateRoot<OrderProperties> {
 
     validate(): void {
         if (!this.properties.orderLines.hasItems()) {
-            throw new Error("Order must have at least one order line");
+            throw new OrderHasOrderLinesWithoutItems();
         }
     }
 
@@ -63,16 +64,25 @@ export class Order extends AggregateRoot<OrderProperties> {
     }
 
     addProduct(product: Product, quantity: number): void {
+        if (this.properties.status !== OrderStatus.DRAFTED) {
+            throw new CannotChangeQuantityOfPlacedOrderError();
+        }
         this.properties.orderLines = this.properties.orderLines.addProduct(product, quantity);
         this.properties.cost = this.properties.orderLines.getTotalPrice();
     }
 
     changeProductQuantity(product: Product, quantity: number): void {
+        if (this.properties.status !== OrderStatus.DRAFTED) {
+            throw new CannotChangeQuantityOfPlacedOrderError();
+        }
         this.properties.orderLines = this.properties.orderLines.changeQuantityOfProduct(product, quantity);
         this.properties.cost = this.properties.orderLines.getTotalPrice();
     }
 
     removeProduct(product: Product): void {
+        if (this.properties.status !== OrderStatus.DRAFTED) {
+            throw new CannotChangeQuantityOfPlacedOrderError();
+        }
         this.properties.orderLines = this.properties.orderLines.removeProduct(product);
         this.properties.cost = this.properties.orderLines.getTotalPrice();
     }
