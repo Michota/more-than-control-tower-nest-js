@@ -17,8 +17,9 @@ export class Money extends ValueObject<MoneyProperties> {
             throw new Error("Money amount must be finite");
         } else if (props.amount.isNegative()) {
             throw new Error("Money amount cannot be negative");
-        } else if (Currency.isCurrency(props.currency)) {
-            throw new Error(`Invalid currency: ${props.currency.code}`);
+        } else if (!Currency.isCurrency(props.currency)) {
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            throw new Error(`Invalid currency: ${props.currency}`);
         }
     }
 
