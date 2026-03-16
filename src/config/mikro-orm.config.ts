@@ -23,9 +23,17 @@ function generateMikroOrmOptions({
     return {
         extensions: [Migrator],
         driver: PostgreSqlDriver,
+        /*
+            we are using `defineEntity` approach.
+            reasons: 
+            - https://mikro-orm.io/docs/using-decorators#comparison-of-approaches
+            - https://mikro-orm.io/docs/define-entity#the-defineentity--class-pattern-recommended
+         */
+        // metadataProvider: ReflectMetadataProvider,
 
-        entities: ["dist/**/*.entity{.ts,.js}"],
-        entitiesTs: ["src/**/*.entity{.ts,.js}"],
+        // entitiesTs: ["src/**/*.entity{.ts,.js}"],
+        // entities: ["dist/**/*.entity{.ts,.js}"],
+        autoLoadEntities: true,
 
         host,
         port,
