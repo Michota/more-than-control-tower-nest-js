@@ -1,5 +1,7 @@
 // Source: https://github.com/sindresorhus/type-fest/pull/4/
 
+import { ConditionalExcept } from "type-fest";
+
 /**
 Create a new type from an object type extracting just properties, not methods.
 @see JustMethods for extract just methods
@@ -18,11 +20,10 @@ interface Foo {
 const foo: JustProperties<Foo> = {a: 'a', b: 1};
 ```
 */
-export type JustProperties<ObjectType> = Pick<
+export type JustProperties<ObjectType> = ConditionalExcept<
     ObjectType,
-    {
-        [Property in keyof ObjectType]: ObjectType[Property] extends (...args: unknown[]) => unknown ? never : Property;
-    }[keyof ObjectType]
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    Function
 >;
 
 /**
