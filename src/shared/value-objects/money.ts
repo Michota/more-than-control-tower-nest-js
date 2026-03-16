@@ -46,6 +46,10 @@ export class Money extends ValueObject<MoneyProperties> {
         return new Money(this.amount.add(other.amount), this.currency);
     }
 
+    static sum(money: Money[]): Money {
+        return money.reduce((acc, m) => acc.add(m), Money.ZERO);
+    }
+
     subtract(other: Money): Money {
         if (!this.isSameCurrency(other)) {
             throw new Error(`Currency mismatch: cannot subtract ${other.currency.code} from ${this.currency.code}`);
