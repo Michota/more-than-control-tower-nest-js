@@ -1,7 +1,7 @@
 import { ValueObject } from "@src/libs/ddd/index.js";
 import { Money } from "../../../shared/value-objects/money.js";
 import { Product } from "../../../shared/value-objects/product.js";
-import { OrderLine } from "./order-line.js";
+import { OrderLine } from "./order-line.value-object.js";
 
 type ProductId = Product["id"];
 

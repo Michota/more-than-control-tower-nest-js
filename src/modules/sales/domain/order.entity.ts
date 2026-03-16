@@ -4,7 +4,7 @@ import { AggregateRoot } from "../../../libs/ddd/aggregate-root.abstract.js";
 import { type EntityProps } from "../../../libs/ddd/entities/entity.abstract.js";
 import { Money } from "../../../shared/value-objects/money.js";
 import { Product } from "../../../shared/value-objects/product.js";
-import { OrderLines } from "./order-lines.js";
+import { OrderLines } from "./order-lines.value-object.js";
 
 type OrderProperties = {
     orderLines: OrderLines;
