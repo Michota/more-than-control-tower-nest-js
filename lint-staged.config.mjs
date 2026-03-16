@@ -1,5 +1,4 @@
 export default {
-    "*.ts": ["pnpm run lint", "pnpm run format"],
-    "*.js": ["pnpm run lint", "pnpm run format"],
-    "*.json": ["pnpm run format"],
+    "*.{ts,js}": ["eslint --fix", "prettier --write --no-error-on-unmatched-pattern"],
+    "*.json": ["prettier --write --no-error-on-unmatched-pattern"],
 };
