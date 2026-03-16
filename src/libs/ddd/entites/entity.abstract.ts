@@ -1,11 +1,13 @@
-import { BrandedId } from "../types";
-import { convertPropertiesToObject } from "./utils";
+import { EntityId as EntityIdClass } from "@src/libs/ddd/entites/entity-id";
+import { SetOptional } from "type-fest";
+import { convertPropertiesToObject } from "../utils";
+
+type EntityId<T> = EntityIdClass<T>["value"];
 
 /*  UUID isn't used there because it can be generated outside of the entity,
     and this outside-generated ID can be of any type (string, number, etc.).
     The important part is that it's unique and immutable. 
  */
-export type EntityId<T> = BrandedId<T, string>;
 
 interface BaseEntityProps<T> {
     id: EntityId<T>;
@@ -18,7 +20,7 @@ export interface EntityProps<T> extends BaseEntityProps<T> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface CreateEntityProps<T> extends EntityProps<T> {}
+export interface CreateEntityProps<T> extends SetOptional<EntityProps<T>, "id" | "createdAt"> {}
 
 export abstract class Entity<T> {
     private _id: EntityId<T>;
@@ -27,7 +29,7 @@ export abstract class Entity<T> {
     protected readonly properties: T;
 
     constructor({ id, createdAt, updatedAt, properties }: CreateEntityProps<T>) {
-        this._id = id;
+        this._id = id ?? new EntityIdClass<T>()["value"];
         this._createdAt = createdAt || new Date();
         this._updatedAt = updatedAt;
         this.properties = properties;
