@@ -1,4 +1,4 @@
-import { Entity } from "@src/libs/ddd";
+import { Entity, EntityProps } from "@src/libs/ddd";
 import { Money } from "./money.js";
 
 interface ProductProperties {
@@ -10,7 +10,17 @@ export class Product extends Entity<ProductProperties> {
         return this.properties.price;
     }
 
+    static create(props: EntityProps<ProductProperties>): Product {
+        const product = new Product(props);
+        product.validate();
+        return product;
+    }
+
+    static reconstitute(props: EntityProps<ProductProperties>): Product {
+        return new Product(props);
+    }
+
     public validate(): void {
-        throw new Error("Method not implemented.");
+        // no need to validate price, as Money will validate itself
     }
 }

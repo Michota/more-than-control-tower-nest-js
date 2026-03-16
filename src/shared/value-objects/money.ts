@@ -10,7 +10,7 @@ interface MoneyProperties {
 export class Money extends ValueObject<MoneyProperties> {
     static readonly ZERO = new Money(new Decimal(0), new Currency("PLN"));
 
-    protected validate(props: MoneyProperties): void {
+    validate(props: MoneyProperties): void {
         if (props.amount.isNaN()) {
             throw new Error("Money amount cannot be NaN");
         } else if (!props.amount.isFinite()) {
