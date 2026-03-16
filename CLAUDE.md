@@ -90,6 +90,9 @@ The `src/shared/` directory contains cross-cutting definitions that multiple mod
 
 The Shared Kernel contains no business logic, no services, and no database access. It is purely a type-level contract layer.
 
+## Architectural Decision Record
+Significant architectural decisions are tracked in `architectural-decision-record.md` at the repo root.
+
 ## Critical Integrity Rules
 These are non-negotiable constraints that must be enforced at the architecture level, not left to application logic:
 
