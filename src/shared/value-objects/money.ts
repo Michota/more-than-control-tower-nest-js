@@ -1,8 +1,8 @@
-import Decimal from 'decimal.js';
-import { Currency } from './currency.js';
+import Decimal from "decimal.js";
+import { Currency } from "./currency.js";
 
 export class Money {
-    static readonly ZERO = new Money(new Decimal(0), new Currency('PLN'));
+    static readonly ZERO = new Money(new Decimal(0), new Currency("PLN"));
 
     constructor(
         readonly amount: Decimal,
