@@ -49,6 +49,8 @@ export abstract class ValueObject<T> {
     }
 
     /**
+     * **This method runs whenever new Value Object is created.**
+     *
      * Throws error if the properties are invalid. Override this method to implement custom validation logic.
      */
     protected abstract validate(props: ValueObjectProperties<T>): void;
