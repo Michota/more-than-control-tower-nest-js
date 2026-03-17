@@ -1,4 +1,5 @@
 import { defineEntity, p } from "@mikro-orm/core";
+import { ItemCategory } from "./item-category.entity";
 import { Price } from "./price.entity";
 
 const ProductSchema = defineEntity({
@@ -6,8 +7,10 @@ const ProductSchema = defineEntity({
     tableName: "products", // ? there's a chance we might need to rename it to "items", as it's more "atomic". Bundles can be considered products, but items not.
     properties: {
         id: p.uuid(),
-        productName: p.string(),
-        // category
+        name: p.string(),
+        description: p.string().nullable(),
+        category: () => p.manyToOne(ItemCategory),
+        vatRate: p.decimal(), // allowed: 0, 5, 8, 23
         availableFrom: p.datetime(),
         availableTo: p.datetime().nullable(), // null means its still active
         prices: p.oneToMany(Price),
