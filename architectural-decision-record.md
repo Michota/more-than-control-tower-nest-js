@@ -80,3 +80,25 @@ Reasons:
 - Cleaner separation between the domain class and its persistence mapping.
 
 See: [MikroORM docs — comparison of approaches](https://mikro-orm.io/docs/using-decorators#comparison-of-approaches) and [defineEntity pattern](https://mikro-orm.io/docs/define-entity#the-defineentity--class-pattern-recommended).
+
+
+# ADR-003: No `MikroOrmRepositoryBase` until proven necessary
+
+**Status:** Accepted
+**Date:** 2026-03-17
+
+## Context
+
+Each infrastructure repository adapter will share a predictable set of operations: `findOneById`, `save` (with Domain Event publication), and `delete`. A shared base class could eliminate this boilerplate.
+
+## Decision
+
+Do not create `MikroOrmRepositoryBase` now. Write the first 2–3 repositories manually. Extract a base class only when the repeated pattern is observed in real code — not speculatively.
+
+## Rationale
+
+Most repositories in this system are query-heavy (custom filters, pagination, cross-field lookups). The generic `save` / `findOneById` / `delete` trio may account for a small fraction of each repository's surface area. A base class built before that ratio is known risks being a premature abstraction: it couples all repositories to a shared inheritance chain to save three methods that may not even be the dominant pattern.
+
+## Revisit when
+
+Three or more repositories contain a copy-pasted `save` block that maps to ORM, calls `persistAndFlush`, and publishes Domain Events. At that point extract exactly what repeats — nothing more.
