@@ -1,5 +1,4 @@
 import { defineEntity, p } from "@mikro-orm/core";
-import { currency } from "@src/shared/persistence/currency.property";
 import { Product } from "./product.entity";
 
 const OrderLineSchema = defineEntity({
@@ -8,8 +7,9 @@ const OrderLineSchema = defineEntity({
     properties: {
         product: () => p.manyToOne(Product),
         quantity: p.integer(),
-        vatRate: p.decimal(),
-        currency,
+        // Disabled. Remove or re-enable, base on experience.
+        // vatRate: p.decimal(),
+        // currency,
     },
 });
 
