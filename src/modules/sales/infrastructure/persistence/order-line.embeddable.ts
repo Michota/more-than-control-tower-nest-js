@@ -1,16 +1,20 @@
 import { defineEntity, p } from "@mikro-orm/core";
 import { currency } from "@src/shared/persistence/currency.property";
+import { Product } from "./product.entity";
 
-const OrderLine = defineEntity({
+const OrderLineSchema = defineEntity({
     name: "OrderLine",
     embeddable: true,
     properties: {
-        productId: p.uuid(),
-        productName: p.string(),
+        product: () => p.manyToOne(Product),
         quantity: p.integer(),
-        unitPrice: p.decimal(),
+        vatRate: p.decimal(),
         currency,
     },
 });
+
+class OrderLine extends OrderLineSchema.class {}
+
+OrderLineSchema.setClass(OrderLine);
 
 export { OrderLine };
