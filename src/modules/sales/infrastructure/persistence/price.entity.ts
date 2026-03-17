@@ -4,7 +4,7 @@ import { Product } from "./product.entity";
 
 const PriceSchema = defineEntity({
     name: "Price",
-    tableName: "prices",
+    tableName: "price",
     properties: {
         id: p.uuid().primary(),
         amount: p.decimal(),

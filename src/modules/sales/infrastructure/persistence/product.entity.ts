@@ -4,7 +4,7 @@ import { Price } from "./price.entity";
 
 const ProductSchema = defineEntity({
     name: "Product",
-    tableName: "products", // ? there's a chance we might need to rename it to "items", as it's more "atomic". Bundles can be considered products, but items not.
+    tableName: "product", // ? there's a chance we might need to rename it to "item", as it's more "atomic". Bundles can be considered products, but items not.
     properties: {
         id: p.uuid(),
         name: p.string(),

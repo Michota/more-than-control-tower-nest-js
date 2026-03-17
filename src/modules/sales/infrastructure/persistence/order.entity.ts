@@ -5,7 +5,7 @@ import { currency } from "@src/shared/persistence/currency.property";
 
 const OrderSchema = defineEntity({
     name: "Order",
-    tableName: "orders",
+    tableName: "order",
     properties: {
         id: p.uuid().primary(),
         cost: p.decimal().nullable(),
