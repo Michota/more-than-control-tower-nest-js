@@ -1,7 +1,7 @@
 import { defineEntity, p } from "@mikro-orm/core";
 import { OrderLine } from "./order-line.embeddable";
 import { currency } from "@src/shared/persistence/currency.property";
-import { OrderStatus } from "./order.statuts";
+import { OrderStatus } from "./order-status.enum";
 
 const OrderSchema = defineEntity({
     name: "Order",

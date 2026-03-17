@@ -9,7 +9,7 @@ import { OrderDraftedDomainEvent } from "./events/order-drafted.domain-event.js"
 import { OrderCustomer } from "./order-customer.entity.js";
 import { OrderLines } from "./order-lines.value-object.js";
 import { CannotChangeQuantityOfPlacedOrderError, OrderHasOrderLinesWithoutItems } from "./order.errors.js";
-import { OrderStatus } from "./order.status.js";
+import { OrderStatus } from "./order-status.enum.js";
 
 interface OrderProperties {
     cost: Money;
