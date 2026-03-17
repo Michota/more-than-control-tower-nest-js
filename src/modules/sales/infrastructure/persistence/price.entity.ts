@@ -2,9 +2,7 @@ import { defineEntity, p } from "@mikro-orm/core";
 import { currency } from "@src/shared/persistence/currency.property";
 import { Product } from "./product.entity";
 
-// TODO: in the future this might be useful, as we plan to add types of prices
-
-export const PriceSchema = defineEntity({
+const PriceSchema = defineEntity({
     name: "Price",
     tableName: "prices",
     properties: {
@@ -14,5 +12,13 @@ export const PriceSchema = defineEntity({
         validFrom: p.datetime(),
         validTo: p.datetime().nullable(), // null means its still active
         product: () => p.manyToOne(Product),
+
+        // ? vatRate
     },
 });
+
+class Price extends PriceSchema.class {}
+
+PriceSchema.setClass(Price);
+
+export { Price };
