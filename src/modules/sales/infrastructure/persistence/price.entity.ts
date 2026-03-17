@@ -11,7 +11,7 @@ const PriceSchema = defineEntity({
         currency,
         validFrom: p.datetime(),
         validTo: p.datetime().nullable(), // null means its still active
-        product: () => p.manyToOne(Product),
+        product: () => p.manyToOne(Product).inversedBy("prices"),
 
         // ? vatRate
     },
