@@ -1,3 +1,4 @@
+import "tsconfig-paths/register"; // <-- Must be first import to work with tsconfig paths
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 
