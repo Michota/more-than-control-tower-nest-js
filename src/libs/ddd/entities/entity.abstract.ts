@@ -18,13 +18,13 @@ export abstract class Entity<T> {
     private _id: EntityId;
     private _createdAt: Date;
     private _updatedAt?: Date;
-    protected readonly properties: T;
+    private readonly _properties: T;
 
     constructor({ id, createdAt, updatedAt, properties }: CreateEntityProps<T>) {
         this._id = id;
         this._createdAt = createdAt || new Date();
         this._updatedAt = updatedAt;
-        this.properties = properties;
+        this._properties = properties;
     }
 
     get id(): EntityId {
@@ -50,7 +50,7 @@ export abstract class Entity<T> {
                 createdAt: this.createdAt,
                 updatedAt: this.updatedAt,
             },
-            { properties: this.properties },
+            { properties: this._properties },
         );
     }
 
@@ -58,8 +58,15 @@ export abstract class Entity<T> {
      * Returns entity properties.
      * @memberof Entity
      */
-    public getProperties(): EntityProps<T> {
+    protected getProperties(): EntityProps<T> {
         return Object.freeze(this.getMutableProperties());
+    }
+    /**
+     * Properties of Entity.
+     * @memberof Entity
+     */
+    get properties(): T {
+        return this.getProperties().properties;
     }
 
     public toObject(): unknown {

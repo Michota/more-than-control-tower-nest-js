@@ -62,7 +62,7 @@ export class OrderMapper implements Mapper<OrderAggregate, RequiredEntityData<Or
      * resolved on flush. The cast on orderLines bypasses the TypeScript structural check.
      */
     toPersistence(domain: OrderAggregate): RequiredEntityData<Order> {
-        const props = domain.getProperties().properties;
+        const props = domain.properties;
 
         const orderLines = Array.from(props.orderLines.getLines().entries()).map(([productId, line]) => ({
             product: { id: productId as string },
