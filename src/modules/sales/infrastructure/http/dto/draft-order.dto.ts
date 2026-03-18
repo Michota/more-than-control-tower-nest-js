@@ -11,7 +11,6 @@ export class AddressDto {
     @IsString() city!: string;
     @IsString() postalCode!: string;
     @IsString() street!: string;
-    @IsString() buildingNumber!: string;
 }
 
 export class CustomerDto {
