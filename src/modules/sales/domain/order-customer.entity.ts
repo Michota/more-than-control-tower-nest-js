@@ -3,7 +3,7 @@ import { EntityWithSchema } from "@src/shared/ddd/entity-with-schema.abstract";
 import { Address } from "@src/shared/value-objects/address.value-object";
 import z from "zod";
 
-const OrderCustomerPropertiesSchema = z.object({
+const orderCustomerPropertiesSchema = z.object({
     firstName: z.string(),
     secondName: z.string(),
     address: z.instanceof(Address),
@@ -11,11 +11,10 @@ const OrderCustomerPropertiesSchema = z.object({
     phoneNumber: z.string(),
 });
 
-type OrderCustomerPropertiesSchema = typeof OrderCustomerPropertiesSchema;
-type OrderCustomerProperties = z.infer<OrderCustomerPropertiesSchema>;
+type OrderCustomerProperties = z.infer<typeof orderCustomerPropertiesSchema>;
 
-export class OrderCustomer extends EntityWithSchema<OrderCustomerPropertiesSchema> {
-    protected schema = OrderCustomerPropertiesSchema;
+export class OrderCustomer extends EntityWithSchema<OrderCustomerProperties> {
+    protected schema = orderCustomerPropertiesSchema;
 
     readonly firstName: string;
     readonly secondName: string;
