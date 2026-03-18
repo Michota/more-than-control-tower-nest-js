@@ -3,7 +3,7 @@ import z, { ZodType } from "zod";
 
 export abstract class ValueObjectWithSchema<
     S extends ZodType,
-    T extends z.infer<S> = z.infer<S>,
+    T /* extends z.infer<S> */ = z.infer<S>,
 > extends ValueObject<T> {
     protected abstract schema: S;
 
