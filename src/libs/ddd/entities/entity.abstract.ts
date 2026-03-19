@@ -5,7 +5,7 @@ import { EntityId } from "./entity-id";
 
 interface BaseEntityProps {
     id: EntityId;
-    createdAt: Date;
+    createdAt?: Date;
     updatedAt?: Date;
 }
 

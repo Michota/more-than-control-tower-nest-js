@@ -26,7 +26,6 @@ export class OrderAggregate extends AggregateRoot<OrderProperties> {
      */
     static draft(properties: DraftedOrderProperties): OrderAggregate {
         const orderDraft = new OrderAggregate({
-            createdAt: new Date(),
             properties: {
                 customer: properties.customer,
                 status: OrderStatus.DRAFTED,
