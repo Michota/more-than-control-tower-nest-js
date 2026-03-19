@@ -1,8 +1,9 @@
 import { Entity, EntityProps } from "@src/libs/ddd";
 import { Money } from "./money.js";
+import { ProductPrice } from "./product-price.value-object.js";
 
 interface ProductProperties {
-    readonly price: Money;
+    price: ProductPrice;
 }
 
 export class Product extends Entity<ProductProperties> {
@@ -22,5 +23,9 @@ export class Product extends Entity<ProductProperties> {
 
     public validate(): void {
         // no need to validate price, as Money will validate itself
+    }
+
+    changePrice(newPrice: Money) {
+        this.properties.price = new ProductPrice({ price: newPrice, productId: this.id });
     }
 }
