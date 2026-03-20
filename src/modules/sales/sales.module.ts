@@ -2,16 +2,18 @@ import { EntityManager } from "@mikro-orm/core";
 import { MikroOrmModule } from "@mikro-orm/nestjs";
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { MikroOrmUnitOfWork } from "@src/shared/infrastructure/mikro-orm-unit-of-work.js";
-import { UNIT_OF_WORK_PORT } from "@src/shared/ports/tokens.js";
-import { DraftOrderHandler } from "./application/commands/draft-order/draft-order.handler.js";
-import { ORDER_REPOSITORY_PORT } from "./application/ports/tokens.js";
+import { MikroOrmUnitOfWork } from "../../shared/infrastructure/mikro-orm-unit-of-work.js";
+import { UNIT_OF_WORK_PORT } from "../../shared/ports/tokens.js";
+import { DraftOrderCommandHandler } from "./application/commands/draft-order/draft-order.command-handler.js";
+import { ITEM_PRICE_REPOSITORY_PORT, ORDER_REPOSITORY_PORT } from "./application/ports/tokens.js";
 import { OrderService } from "./application/services/order.service.js";
 import { OrderController } from "./infrastructure/http/order.controller.js";
+import { ItemPriceRepository } from "./infrastructure/persistence/item-price.repository.js";
 import { OrderLine } from "./infrastructure/persistence/order-line.embeddable.js";
 import { Order } from "./infrastructure/persistence/order.entity.js";
 import { OrderRepository } from "./infrastructure/persistence/order.repository.js";
 import { Price } from "./infrastructure/persistence/price.entity.js";
+import { PriceType } from "./infrastructure/persistence/price-type.entity.js";
 import { Product } from "./infrastructure/persistence/product.entity.js";
 
 /**
@@ -28,11 +30,11 @@ import { Product } from "./infrastructure/persistence/product.entity.js";
  * *"Fakturownia" is a name of accountancy-SaaS; it's just an example.
  */
 @Module({
-    imports: [MikroOrmModule.forFeature([Order, Product, OrderLine, Price])],
+    imports: [MikroOrmModule.forFeature([Order, Product, OrderLine, Price, PriceType])],
     controllers: [OrderController],
     providers: [
         OrderService,
-        DraftOrderHandler,
+        DraftOrderCommandHandler,
         {
             provide: ORDER_REPOSITORY_PORT,
             useFactory: (config: ConfigService, em: EntityManager) => {
@@ -42,6 +44,11 @@ import { Product } from "./infrastructure/persistence/product.entity.js";
                 //     : new OrderRepository(em);
             },
             inject: [ConfigService, EntityManager],
+        },
+        {
+            provide: ITEM_PRICE_REPOSITORY_PORT,
+            useFactory: (em: EntityManager) => new ItemPriceRepository(em),
+            inject: [EntityManager],
         },
         {
             provide: UNIT_OF_WORK_PORT,

@@ -1,18 +1,26 @@
-import { IdOfEntity } from "@src/libs/ddd/aggregate-root.abstract.js";
-import { Command, CommandProps } from "@src/libs/ddd/command.js";
-import { OrderAggregate } from "@src/modules/sales/domain/order.aggregate.js";
-import { OrderCustomer } from "../../../domain/order-customer.entity.js";
-import { OrderLines } from "../../../domain/order-lines.value-object.js";
+import { IdOfEntity } from "../../../../../libs/ddd/aggregate-root.abstract.js";
+import { Command, CommandProps } from "../../../../../libs/ddd/command.js";
+import { OrderAggregate } from "../../../domain/order.aggregate.js";
+
+export interface DraftOrderLine {
+    itemId: string;
+    quantity: number;
+    priceId?: string;
+}
 
 export class DraftOrderCommand extends Command {
     readonly orderId?: IdOfEntity<OrderAggregate>;
-    readonly customer: OrderCustomer;
-    readonly orderLines: OrderLines;
+    readonly customerId: string;
+    readonly lines: DraftOrderLine[];
+    readonly currency: string;
+    readonly buyerPriceTypeId?: string;
 
     constructor(props: CommandProps<DraftOrderCommand>) {
         super(props);
         this.orderId = props.orderId;
-        this.customer = props.customer;
-        this.orderLines = props.orderLines;
+        this.customerId = props.customerId;
+        this.lines = props.lines;
+        this.currency = props.currency;
+        this.buyerPriceTypeId = props.buyerPriceTypeId;
     }
 }
