@@ -13,7 +13,7 @@ const ProductSchema = defineEntity({
         vatRate: p.decimal(), // allowed: 0, 5, 8, 23
         availableFrom: p.datetime(),
         availableTo: p.datetime().nullable(), // null means its still active
-        prices: p.oneToMany(Price).mappedBy("product").orphanRemoval(),
+        prices: () => p.oneToMany(Price).mappedBy("product").orphanRemoval(),
     },
 });
 
@@ -21,4 +21,4 @@ class Product extends ProductSchema.class {}
 
 ProductSchema.setClass(Product);
 
-export { Product };
+export { Product, ProductSchema };

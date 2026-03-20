@@ -14,4 +14,4 @@ class ItemCategory extends ItemCategorySchema.class {}
 
 ItemCategorySchema.setClass(ItemCategory);
 
-export { ItemCategory };
+export { ItemCategory, ItemCategorySchema };
