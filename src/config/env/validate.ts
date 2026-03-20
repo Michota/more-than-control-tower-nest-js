@@ -1,17 +1,10 @@
-import { plainToInstance } from "class-transformer";
-import { validateSync } from "class-validator";
-import { EnvironmentVariables } from "./environment-variables";
+import { env } from "../env.js";
 
-export function validate(config: Record<string, unknown>) {
-    const validated = plainToInstance(EnvironmentVariables, config, {
-        enableImplicitConversion: true,
-    });
-
-    const errors = validateSync(validated);
-
-    if (errors.length > 0) {
-        throw new Error(errors.toString());
-    }
-
-    return validated;
+/*
+    NestJS ConfigModule calls this during bootstrap. Importing `env` is enough -
+    the Zod parse runs at module load time and throws immediately if env is invalid.
+*/
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function validate(_config: Record<string, unknown>) {
+    return env;
 }

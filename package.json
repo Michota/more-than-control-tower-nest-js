@@ -5,8 +5,12 @@
     "author": "",
     "private": true,
     "license": "UNLICENSED",
+    "mikro-orm": {},
     "scripts": {
         "build": "nest build",
+        "migration:create": "mikro-orm migration:create",
+        "migration:up": "mikro-orm migration:up",
+        "migration:down": "mikro-orm migration:down",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" --no-error-on-unmatched-pattern",
         "start": "nest start",
         "start:dev": "nest start --watch",
@@ -68,6 +72,7 @@
         "ts-loader": "^9.5.2",
         "ts-node": "^10.9.2",
         "tsconfig-paths": "^4.2.0",
+        "tsx": "^4.21.0",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.20.0"
     },

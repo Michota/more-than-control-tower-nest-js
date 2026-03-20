@@ -31,8 +31,8 @@ function generateMikroOrmOptions({
          */
         // metadataProvider: ReflectMetadataProvider,
 
-        // entitiesTs: ["src/**/*.entity{.ts,.js}"],
-        // entities: ["dist/**/*.entity{.ts,.js}"],
+        // entitiesTs: ["src/**/*.entity.ts", "src/**/*.embeddable.ts"],
+        // entities: ["dist/**/*.entity.js", "dist/**/*.embeddable.js"],
         autoLoadEntities: true,
 
         host,
