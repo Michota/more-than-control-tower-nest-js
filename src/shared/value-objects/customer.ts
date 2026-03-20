@@ -1,4 +1,4 @@
-import { EntityProps } from "@src/libs/ddd";
+import { EntityProps } from "../../libs/ddd";
 import z from "zod";
 import { EntityWithSchema } from "../ddd/entity-with-schema.abstract";
 
@@ -10,7 +10,9 @@ const customerPropertiesSchema = z.object({
 type CustomerProperties = z.infer<typeof customerPropertiesSchema>;
 
 export class Customer extends EntityWithSchema<CustomerProperties> {
-    protected schema = customerPropertiesSchema;
+    protected get schema() {
+        return customerPropertiesSchema;
+    }
 
     static create(props: EntityProps<CustomerProperties>): Customer {
         const newCustomer = new Customer(props);
