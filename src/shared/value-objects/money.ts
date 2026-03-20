@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { ValueObject } from "@src/libs/ddd/index.js";
+import { ValueObject } from "../../libs/ddd/index.js";
 import { Currency } from "./currency.js";
 
 interface MoneyProperties {

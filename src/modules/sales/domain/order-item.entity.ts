@@ -1,4 +1,4 @@
-import { Entity, EntityProps } from "@src/libs/ddd";
+import { Entity, EntityProps } from "../../../libs/ddd";
 import { Money } from "../../../shared/value-objects/money.js";
 import { ItemPrice } from "./item-price.value-object.js";
 

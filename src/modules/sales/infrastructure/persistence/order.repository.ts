@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { EntityManager } from "@mikro-orm/core";
-import { Paginated, PaginatedQueryParameters } from "@src/libs/ports/repository.port.js";
+import { Paginated, PaginatedQueryParameters } from "../../../../libs/ports/repository.port.js";
 import { OrderAggregate } from "../../domain/order.aggregate.js";
 import { Order } from "./order.entity.js";
 import { OrderMapper } from "./order.mapper.js";
@@ -9,10 +9,6 @@ import { OrderRepositoryPort } from "../order.repository.port.js";
 @Injectable()
 export class OrderRepository implements OrderRepositoryPort {
     private readonly mapper = new OrderMapper();
-
-    private fakeAsyncOperation<T>(any?: T): Promise<T> {
-        return new Promise(() => any);
-    }
 
     constructor(private readonly em: EntityManager) {}
 
@@ -55,8 +51,8 @@ export class OrderRepository implements OrderRepositoryPort {
         for (const order of orders) {
             this.em.persist(this.em.create(Order, this.mapper.toPersistence(order)));
         }
-        await this.fakeAsyncOperation();
-        return;
+
+        return Promise.resolve();
     }
 
     async delete(order: OrderAggregate): Promise<boolean> {

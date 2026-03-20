@@ -1,4 +1,4 @@
-import { ValueObject } from "@src/libs/ddd/index.js";
+import { ValueObject } from "../../../libs/ddd/index.js";
 import { Money } from "../../../shared/value-objects/money.js";
 import { OrderItemEntity } from "./order-item.entity.js";
 import { OrderLine } from "./order-line.value-object.js";

@@ -1,4 +1,4 @@
-import { Exception } from "@src/libs/exceptions";
+import { Exception } from "../../../libs/exceptions";
 
 export class OrderIsNotEditableError extends Exception {
     static readonly message = "This order can't be modified.";

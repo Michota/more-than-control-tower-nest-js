@@ -1,5 +1,5 @@
-import { ArgumentInvalidException } from "@libs/exceptions";
-import { ValueObject } from "@src/libs/ddd/index.js";
+import { ArgumentInvalidException } from "../../libs/exceptions";
+import { ValueObject } from "../../libs/ddd/index.js";
 
 export class Currency extends ValueObject<string> {
     protected validate(props: { value: string }): void {

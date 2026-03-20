@@ -1,11 +1,11 @@
-import { ArgumentInvalidException, ArgumentNotProvidedException } from "@libs/exceptions";
-import { DisallowProperty } from "@libs/types";
+import { ArgumentInvalidException, ArgumentNotProvidedException } from "../../exceptions";
+import { DisallowProperty } from "../../types";
 import { has, isEmpty } from "es-toolkit/compat";
 import { DomainPrimitive, DomainPrimitiveValue, isDomainPrimitiveAbstract } from "./domain-primitive";
 
 type DisallowId<T> = DisallowProperty<T, "id">;
 
-type ValueObjectProperties<T> = DisallowId<T extends DomainPrimitiveValue ? DomainPrimitive<T> : T>;
+export type ValueObjectProperties<T> = DisallowId<T extends DomainPrimitiveValue ? DomainPrimitive<T> : T>;
 
 export abstract class ValueObject<T> {
     protected readonly properties: ValueObjectProperties<T>;

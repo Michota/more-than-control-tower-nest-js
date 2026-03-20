@@ -21,16 +21,12 @@
         "forceConsistentCasingInFileNames": true,
         "noImplicitAny": true,
         "strictBindCallApply": true,
-        "noFallthroughCasesInSwitch": true,
+        "noFallthroughCasesInSwitch": true
 
-        "paths": {
-            // `dist/*` is added to support running the compiled code without needing to change the import paths
-            "@src/*": ["src/*", "dist/*"],
-            "@modules/*": ["src/modules/*", "dist/modules/*"],
-            "@config/*": ["src/config/*", "dist/config/*"],
-            "@libs/*": ["src/libs/*", "dist/libs/*"],
-            "@tests/*": ["tests/*"]
-        }
+        // "paths": {
+        //  Do not use absolute paths.
+        //  They cause problems with NestJs and MikroORM, which expect relative paths.
+        // }
     },
 
     "exclude": [".kanelrc.js", "node_modules", "dist"]

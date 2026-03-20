@@ -1,6 +1,6 @@
 import { defineEntity, p } from "@mikro-orm/core";
 import { OrderLine } from "./order-line.embeddable";
-import { currency } from "@src/shared/persistence/currency.property";
+import { currency } from "../../../../shared/persistence/currency.property";
 import { OrderStatus } from "./order-status.enum";
 
 const OrderSchema = defineEntity({
@@ -12,7 +12,7 @@ const OrderSchema = defineEntity({
         currency,
         status: p.enum(() => OrderStatus),
         orderLines: p.embedded(OrderLine).array().default([]),
-        customerId: p.uuid,
+        customerId: p.uuid(),
     },
 });
 
@@ -20,4 +20,4 @@ class Order extends OrderSchema.class {}
 
 OrderSchema.setClass(Order);
 
-export { Order };
+export { Order, OrderSchema };
