@@ -102,3 +102,79 @@ Most repositories in this system are query-heavy (custom filters, pagination, cr
 ## Revisit when
 
 Three or more repositories contain a copy-pasted `save` block that maps to ORM, calls `persistAndFlush`, and publishes Domain Events. At that point extract exactly what repeats — nothing more.
+
+
+# ADR-004: One HTTP controller per module
+
+**Status:** Accepted
+**Date:** 2026-03-21
+
+## Context
+
+During early development, the codebase used one HTTP controller per feature (i.e. per command or query — `DraftOrderController`, `GetOrderController`, etc.), registering multiple controllers in a single NestJS module's `controllers` array.
+
+This caused a concrete runtime issue: NestJS resolved controllers by their index in the array. When multiple single-feature controllers were registered in the same module, they overwrote each other depending on their order, producing silent routing failures that were difficult to diagnose.
+
+## Decision
+
+Each module exposes exactly one `HttpController` class (e.g. `SalesHttpController`). All HTTP endpoints for that module's features are methods on that single controller.
+
+## Consequences
+
+### Positive
+- Eliminates the NestJS multi-controller index collision issue entirely.
+- Route grouping is explicit — all Sales endpoints are visibly co-located in one file.
+- Single controller per module aligns naturally with the one-module-per-bounded-context structure.
+
+### Negative
+- Controller file grows as the module gains more endpoints. Mitigated by keeping handler methods thin — each method delegates immediately to a command or query, holding no logic of its own.
+- BDD and integration tests that target individual endpoints must import the full controller rather than a focused single-feature one. In practice this has negligible impact since tests call endpoints via HTTP, not by instantiating the controller directly.
+
+## Rejected alternative
+
+One controller per command/query. Rejected due to the runtime routing collision described above. May be revisited if NestJS resolves the underlying issue in a future major version.
+
+
+# ADR-005: `Object.defineProperty` for internal fields in `Entity` and `AggregateRoot`
+
+**Status:** Accepted, pending review
+**Date:** 2026-03-21
+
+## Context
+
+Both `Entity` and `AggregateRoot` use `Object.defineProperty` to initialize their internal fields, combined with TypeScript's `declare` keyword to suppress the compiler's own field initialization.
+
+In `Entity` (`entity.abstract.ts`), four fields are defined this way: `_id`, `_createdAt`, `_updatedAt`, and `_properties`. All are set with `enumerable: false`. `_properties` additionally uses `writable: false, configurable: false` — making it a true runtime constant, beyond what TypeScript's `readonly` can guarantee.
+
+In `AggregateRoot` (`aggregate-root.abstract.ts`), `_domainEvents` is defined with `enumerable: false, writable: true` — it must be reassignable (via `clearEvents()`), but must not appear in serialized output.
+
+The motivation in both cases is the same: these fields are internal infrastructure concerns that must not leak into `JSON.stringify`, `Object.keys()`, or spread operations.
+
+Importantly, `Entity.toJSON()` is explicitly defined and returns only `{ id, ...properties }` — so the non-enumerability of internal fields already has a controlled serialization path in place.
+
+## Decision
+
+Keep the current `defineProperty` approach for now.
+
+## Rationale for keeping it
+
+- `_properties` on `Entity` benefits from `writable: false, configurable: false` — a runtime immutability guarantee that TypeScript's `readonly` does not provide. This is a meaningful distinction.
+- `_domainEvents` must be non-enumerable to avoid leaking event payloads in any serialization path not routed through `toJSON()`.
+- The pattern is already consistently applied across both base classes, so removing it partially would be inconsistent.
+
+## Simplification path
+
+The `defineProperty` usage can be reconsidered in two independent parts:
+
+**For `_domainEvents` in `AggregateRoot`:** Can be replaced with a plain class field if all aggregates are serialized exclusively through mappers and never directly. Replacement:
+```typescript
+private _domainEvents: DomainEvent<Properties>[] = [];
+```
+
+**For `_id`, `_createdAt`, `_updatedAt` in `Entity`:** Can be replaced with plain class fields — the `toJSON()` method already guarantees controlled output regardless of enumerability.
+
+**For `_properties` in `Entity`:** Replacement requires care. A plain `private readonly _properties` would lose the runtime `writable: false` guarantee. Acceptable only if `Object.freeze()` is applied to properties at construction time as a substitute.
+
+## Revisit when
+
+A full audit of serialization paths confirms that no entity or aggregate is ever serialized outside of a mapper's `toJSON()` call, and the team is comfortable relying on TypeScript `readonly` rather than runtime `writable: false` for `_properties`.
