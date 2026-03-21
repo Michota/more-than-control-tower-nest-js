@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsBoolean, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsInt, IsOptional, IsString, Min } from "class-validator";
 
 export class SearchCustomersRequestDto {
     @IsString()
@@ -24,4 +24,16 @@ export class SearchCustomersRequestDto {
     @IsOptional()
     @Transform(({ value }) => value === "true")
     alsoSearchByPhone?: boolean;
+
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    @Transform(({ value }) => parseInt(value, 10))
+    page?: number;
+
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    @Transform(({ value }) => parseInt(value, 10))
+    limit?: number;
 }

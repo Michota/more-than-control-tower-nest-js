@@ -30,12 +30,17 @@ export class CustomerController {
     @Get("search")
     async searchCustomers(@Query() dto: SearchCustomersRequestDto): Promise<SearchCustomersResponse> {
         return this.queryBus.execute(
-            new SearchCustomersQuery(dto.query, {
-                alsoSearchByDescription: dto.alsoSearchByDescription,
-                alsoSearchByAddress: dto.alsoSearchByAddress,
-                alsoSearchByEmail: dto.alsoSearchByEmail,
-                alsoSearchByPhone: dto.alsoSearchByPhone,
-            }),
+            new SearchCustomersQuery(
+                dto.query,
+                {
+                    alsoSearchByDescription: dto.alsoSearchByDescription,
+                    alsoSearchByAddress: dto.alsoSearchByAddress,
+                    alsoSearchByEmail: dto.alsoSearchByEmail,
+                    alsoSearchByPhone: dto.alsoSearchByPhone,
+                },
+                dto.page,
+                dto.limit,
+            ),
         );
     }
 

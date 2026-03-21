@@ -1,5 +1,6 @@
 import { Inject } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
+import { Paginated } from "../../../../../libs/ports/repository.port.js";
 import type { CustomerRepositoryPort } from "../../../infrastructure/customer.repository.port.js";
 import { CUSTOMER_REPOSITORY_PORT } from "../../ports/tokens.js";
 import { SearchCustomersQuery, SearchCustomersResponse } from "./search-customers.query.js";
@@ -12,14 +13,16 @@ export class SearchCustomersQueryHandler implements IQueryHandler<SearchCustomer
     ) {}
 
     async execute(query: SearchCustomersQuery): Promise<SearchCustomersResponse> {
-        const customers = await this.customerRepo.search(query.term, query.filters);
+        const { data, count } = await this.customerRepo.search(query.term, query.filters, {
+            page: query.page,
+            limit: query.limit,
+        });
 
-        return customers.map((customer) => ({
-            id: customer.id,
-            name: customer.name,
-            description: customer.description,
-            addresses: customer.addresses,
-            contacts: customer.contacts,
-        }));
+        return new Paginated({
+            data,
+            count,
+            page: query.page,
+            limit: query.limit,
+        });
     }
 }

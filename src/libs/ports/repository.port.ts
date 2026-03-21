@@ -7,6 +7,8 @@
     in a respective repository.**
 */
 
+import { OffsetPaginationParameters } from "src/libs/types/pagination";
+
 export class Paginated<T> {
     readonly count: number;
     readonly limit: number;
@@ -25,12 +27,9 @@ export type OrderDirection = "asc" | "desc";
 
 export type OrderBy = { field: string | true; direction: OrderDirection };
 
-export type PaginatedQueryParameters = {
-    limit: number;
-    page: number;
-    offset: number;
+export interface PaginatedQueryParameters extends OffsetPaginationParameters {
     orderBy: OrderBy;
-};
+}
 
 export interface RepositoryPort<Entity> {
     save(entity: Entity | Entity[]): Promise<void>;

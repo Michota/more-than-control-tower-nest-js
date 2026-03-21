@@ -5,6 +5,7 @@ import { CustomerAggregate } from "../../domain/customer.aggregate.js";
 import { CustomerRepositoryPort } from "../customer.repository.port.js";
 import { Customer } from "./customer.entity.js";
 import { CustomerMapper } from "./customer.mapper.js";
+import { PaginationParameters } from "src/libs/types/pagination.js";
 
 const POPULATE = ["addresses", "contacts"] as const;
 
@@ -52,7 +53,8 @@ export class CustomerRepository implements CustomerRepositoryPort {
             alsoSearchByEmail?: boolean;
             alsoSearchByPhone?: boolean;
         } = {},
-    ): Promise<CustomerAggregate[]> {
+        pagination: PaginationParameters = { page: 1, limit: 20 },
+    ): Promise<{ data: CustomerAggregate[]; count: number }> {
         const pattern = `%${term}%`;
         const conditions: object[] = [{ name: { $ilike: pattern } }];
 
@@ -76,8 +78,17 @@ export class CustomerRepository implements CustomerRepositoryPort {
             conditions.push({ contacts: { type: "phone", value: { $ilike: pattern } } });
         }
 
-        const records = await this.em.find(Customer, { $or: conditions }, { populate: POPULATE });
-        return records.map((r) => this.mapper.toDomain(r));
+        const [records, count] = await this.em.findAndCount(
+            Customer,
+            { $or: conditions },
+            {
+                populate: POPULATE,
+                limit: pagination.limit,
+                offset: (pagination.page - 1) * pagination.limit,
+            },
+        );
+
+        return { data: records.map((r) => this.mapper.toDomain(r)), count };
     }
 
     async save(entity: CustomerAggregate | CustomerAggregate[]): Promise<void> {

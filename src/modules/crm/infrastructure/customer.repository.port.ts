@@ -1,3 +1,4 @@
+import { PaginationParameters } from "src/libs/types/pagination.js";
 import { RepositoryPort } from "../../../libs/ports/repository.port.js";
 import { CustomerAggregate } from "../domain/customer.aggregate.js";
 
@@ -10,5 +11,6 @@ export interface CustomerRepositoryPort extends RepositoryPort<CustomerAggregate
             alsoSearchByEmail?: boolean;
             alsoSearchByPhone?: boolean;
         },
-    ): Promise<CustomerAggregate[]>;
+        pagination?: PaginationParameters,
+    ): Promise<{ data: CustomerAggregate[]; count: number }>;
 }
