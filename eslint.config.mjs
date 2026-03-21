@@ -30,6 +30,13 @@ export default tseslint.config(
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-floating-promises": "warn",
             "@typescript-eslint/no-unsafe-argument": "warn",
+            "no-restricted-syntax": [
+                "error",
+                {
+                    selector: "MemberExpression[object.name='process'][property.name='env']",
+                    message: "Use the typed `env` from src/config/env.ts instead of process.env directly.",
+                },
+            ],
         },
     },
 );

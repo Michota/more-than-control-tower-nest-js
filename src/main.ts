@@ -1,10 +1,9 @@
-// ! TODO: This is potentially dangerous, as it will load all environment variables from the .env file into process.env, which can lead to security issues if not handled properly. Make sure to only include necessary environment variables in the .env file and avoid committing sensitive information to version control.
-import "dotenv/config"; // <-- Must be before any module that reads process.env
-import "tsconfig-paths/register"; // <-- Must be first import to work with tsconfig paths
-import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
-import { AppModule } from "./app.module";
+import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import "tsconfig-paths/register"; // <-- Must be first import to work with tsconfig paths
+import { AppModule } from "./app.module";
+import { env } from "./config/env";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -15,7 +14,7 @@ async function bootstrap() {
     const documentFactory = () => SwaggerModule.createDocument(app, config);
     SwaggerModule.setup("api", app, documentFactory);
 
-    await app.listen(process.env.PORT ?? 3000);
+    await app.listen(env.SERVER_PORT);
 }
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 bootstrap();

@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { env } from "./src/config/env.js";
 import { generateMikroOrmOptions } from "./src/config/generate-mikro-orm.config.js";
 import { MikroOrmModuleSyncOptions } from "@mikro-orm/nestjs";
