@@ -1,12 +1,13 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, NotFoundException, Param, ParseUUIDPipe, Post, Query } from "@nestjs/common";
 import { QueryBus } from "@nestjs/cqrs";
+import { type UUID } from "crypto";
 import {
     SearchCustomersQuery,
     SearchCustomersResponse,
 } from "../../application/queries/search-customers/search-customers.query.js";
-import { SearchCustomersRequestDto } from "./dto/search-customers.request.dto.js";
 import { CustomerService } from "../../application/services/customer.service.js";
 import { CreateCustomerRequest } from "./dto/create-customer.request.dto.js";
+import { SearchCustomersRequestDto } from "./dto/search-customers.request.dto.js";
 
 @Controller("customer")
 export class CustomerController {
@@ -45,7 +46,7 @@ export class CustomerController {
     }
 
     @Get(":id")
-    async getCustomer(@Param("id") id: string) {
+    async getCustomer(@Param("id", ParseUUIDPipe) id: UUID) {
         const customer = await this.customerService.getCustomer(id);
         if (!customer) throw new NotFoundException(`Customer ${id} not found`);
         return customer;
