@@ -1,13 +1,16 @@
 import { RequiredEntityData } from "@mikro-orm/core";
+import { Injectable } from "@nestjs/common";
 import { Mapper } from "../../../libs/ddd/mapper.interface.js";
 import { EntityId } from "../../../libs/ddd/entities/entity-id.js";
+import { GetCustomerResponse } from "../../../shared/queries/get-customer.query.js";
 import { CustomerAddress as DomainCustomerAddress } from "../domain/customer-address.value-object.js";
 import { CustomerContact as DomainCustomerContact } from "../domain/customer-contact.value-object.js";
 import { ContactType } from "../domain/customer-contact-type.enum.js";
 import { CustomerAggregate } from "../domain/customer.aggregate.js";
 import { Customer } from "./customer.entity.js";
 
-export class CustomerMapper implements Mapper<CustomerAggregate, RequiredEntityData<Customer>> {
+@Injectable()
+export class CustomerMapper implements Mapper<CustomerAggregate, RequiredEntityData<Customer>, GetCustomerResponse> {
     toDomain(record: Customer): CustomerAggregate {
         const addresses = record.addresses.getItems().map(
             (a) =>
@@ -64,7 +67,13 @@ export class CustomerMapper implements Mapper<CustomerAggregate, RequiredEntityD
         };
     }
 
-    toResponse(entity: CustomerAggregate): unknown {
-        return entity.toObject();
+    toResponse(customer: CustomerAggregate): GetCustomerResponse {
+        return {
+            id: customer.id,
+            name: customer.name,
+            description: customer.description,
+            addresses: customer.addresses,
+            contacts: customer.contacts,
+        };
     }
 }

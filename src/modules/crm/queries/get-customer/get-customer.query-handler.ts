@@ -1,6 +1,7 @@
 import { Inject } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { GetCustomerQuery, GetCustomerResponse } from "../../../../shared/queries/get-customer.query.js";
+import { CustomerMapper } from "../../database/customer.mapper.js";
 import type { CustomerRepositoryPort } from "../../database/customer.repository.port.js";
 import { CUSTOMER_REPOSITORY_PORT } from "../../crm.di-tokens.js";
 
@@ -9,6 +10,7 @@ export class GetCustomerQueryHandler implements IQueryHandler<GetCustomerQuery, 
     constructor(
         @Inject(CUSTOMER_REPOSITORY_PORT)
         private readonly customerRepo: CustomerRepositoryPort,
+        private readonly mapper: CustomerMapper,
     ) {}
 
     async execute(query: GetCustomerQuery): Promise<GetCustomerResponse | null> {
@@ -17,12 +19,6 @@ export class GetCustomerQueryHandler implements IQueryHandler<GetCustomerQuery, 
             return null;
         }
 
-        return {
-            id: customer.id,
-            name: customer.name,
-            description: customer.description,
-            addresses: customer.addresses,
-            contacts: customer.contacts,
-        };
+        return this.mapper.toResponse(customer);
     }
 }

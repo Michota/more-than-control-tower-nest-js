@@ -1,8 +1,8 @@
 import { Inject } from "@nestjs/common";
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { Paginated } from "../../../../libs/ports/repository.port.js";
-import type { CustomerRepositoryPort } from "../../database/customer.repository.port.js";
 import { CUSTOMER_REPOSITORY_PORT } from "../../crm.di-tokens.js";
+import type { CustomerRepositoryPort } from "../../database/customer.repository.port.js";
 import { SearchCustomersQuery, SearchCustomersResponse } from "./search-customers.query.js";
 
 @QueryHandler(SearchCustomersQuery)

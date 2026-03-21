@@ -10,6 +10,7 @@ import { CrmHttpController } from "./crm.http.controller.js";
 import { CustomerAddress } from "./database/customer-address.entity.js";
 import { CustomerContact } from "./database/customer-contact.entity.js";
 import { Customer } from "./database/customer.entity.js";
+import { CustomerMapper } from "./database/customer.mapper.js";
 import { CustomerRepository } from "./database/customer.repository.js";
 import { CUSTOMER_REPOSITORY_PORT } from "./crm.di-tokens.js";
 
@@ -17,6 +18,7 @@ import { CUSTOMER_REPOSITORY_PORT } from "./crm.di-tokens.js";
     imports: [MikroOrmModule.forFeature([Customer, CustomerAddress, CustomerContact])],
     controllers: [CrmHttpController],
     providers: [
+        CustomerMapper,
         CreateCustomerCommandHandler,
         GetCustomerQueryHandler,
         SearchCustomersQueryHandler,
