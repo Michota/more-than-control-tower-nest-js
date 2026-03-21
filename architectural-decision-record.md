@@ -178,3 +178,111 @@ private _domainEvents: DomainEvent<Properties>[] = [];
 ## Revisit when
 
 A full audit of serialization paths confirms that no entity or aggregate is ever serialized outside of a mapper's `toJSON()` call, and the team is comfortable relying on TypeScript `readonly` rather than runtime `writable: false` for `_properties`.
+
+
+# ADR-006: ValueObject properties enforced as deeply readonly at the type level
+
+**Status:** Proposed (not yet confirmed — approach under investigation)
+**Date:** 2026-03-21
+
+## Context
+
+`ValueObject<T>` currently stores its properties as `protected readonly properties: ValueObjectProperties<T>`. The `readonly` modifier is TypeScript-only — it prevents reassignment of the `properties` reference, but does not prevent mutation of nested fields within `T`.
+
+For example, if a VO holds `{ address: { street: string } }`, TypeScript does not prevent `vo.properties.address.street = 'changed'` from within the class or a subclass.
+
+This is inconsistent with the DDD principle that Value Objects are immutable. The current runtime safeguard (`Object.freeze()` in `unpack()`) is applied only at read time, not at construction time, and only on the returned value — the internal `properties` object itself remains mutable.
+
+## Decision
+
+Not yet confirmed. Under investigation.
+
+## Proposed approach
+
+Apply a `DeepReadonly<T>` mapped type to `ValueObjectProperties<T>` so that the TypeScript compiler enforces immutability on all nested fields, not just the top-level reference:
+
+```typescript
+type DeepReadonly<T> = {
+    readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K];
+};
+
+export type ValueObjectProperties<T> = DeepReadonly<DisallowId<T extends DomainPrimitiveValue ? DomainPrimitive<T> : T>>;
+```
+
+This would make all VO property access compile-time readonly without any runtime cost.
+
+Alternatively, `Object.freeze()` applied recursively at construction time in `ValueObject` constructor would enforce the same guarantee at runtime, catching mutations in JavaScript contexts where TypeScript is not present (e.g. tests using `as any`).
+
+Both approaches can be combined.
+
+## Open questions
+
+- Does `DeepReadonly` interact correctly with `DomainPrimitive<T>` and the existing `DisallowId` mapped type?
+- Does applying `DeepReadonly` break any existing VO subclasses that currently mutate nested properties (intentionally or not)?
+- Is `Object.freeze()` at construction time preferable to `DeepReadonly` at the type level, or should both be applied?
+
+## Revisit when
+
+A concrete VO is written that exposes a mutation bug, or the team decides to audit existing VOs for unintended mutability.
+
+
+# ADR-007: Testing strategy — levels, styles, and tooling
+
+**Status:** Pending review
+**Date:** 2026-03-21
+
+## Context
+
+The codebase uses hexagonal architecture with CQRS. Tests need to cover domain invariants, use case behavior, infrastructure correctness, and full HTTP stack — each at a different level of isolation and speed.
+
+The team evaluated BDD-style tests (Given/When/Then) vs traditional unit tests, and Jest vs Cucumber for the test runner.
+
+## Decision
+
+### 1. Three test levels
+
+**Level 1 — Domain unit tests**
+Target: aggregate methods, value object validation, domain service logic.
+Tools: Jest, no infrastructure, no mocks.
+Goal: verify that domain invariants are enforced in isolation.
+
+**Level 2 — Handler BDD tests (primary level)**
+Target: command and query handlers — the entry point for each use case.
+Tools: Jest, in-memory repository implementations, `NoOpUnitOfWork`, `FakeEventBus`.
+Goal: describe and verify business behavior end-to-end through the use case, without hitting a real database.
+This is the primary testing level. Most behavioral coverage lives here.
+
+**Level 3 — Repository and E2E tests**
+Target: MikroORM repository adapters and full HTTP stack.
+Tools: Jest + Testcontainers (`@testcontainers/postgresql`) — a real PostgreSQL container started programmatically per test run.
+Goal: verify ORM mappings, database constraints, and full request/response HTTP behavior.
+
+### 2. BDD style with Jest, not Cucumber
+
+Tests are written using Jest's nested `describe` / `it` blocks following Given/When/Then structure. Cucumber (Gherkin) is not used.
+
+Rationale: Cucumber adds value when non-technical stakeholders write or read scenarios. In this project all specs are developer-owned. The indirection of `.feature` files, step definitions, and a Gherkin runner adds friction with no payoff. Jest with descriptive `describe` nesting is readable enough for the audience.
+
+### 3. In-memory repositories for handler tests
+
+Handler BDD tests use hand-written in-memory implementations of each repository port (e.g. `InMemoryOrderRepository implements OrderRepositoryPort`). These store domain objects in a `Map` and expose a `seed()` helper for test setup.
+
+Mocking individual methods with `jest.fn()` is not used at the repository level — it tests call signatures, not behavior. In-memory repos test that data actually persists and is retrievable.
+
+### 4. Testcontainers for repository and E2E tests
+
+A real PostgreSQL container is started in Jest's `globalSetup` via `@testcontainers/postgresql`. The container URI is injected into `process.env.DATABASE_URL` before any test file runs. MikroORM picks it up via the standard config. The container is stopped in `globalTeardown`.
+
+This eliminates the need for a separately managed test database or Docker Compose step before running tests.
+
+## Consequences
+
+### Positive
+- Handler BDD tests run fast (no I/O) and cover the majority of behavioral scenarios.
+- Real database in repository/E2E tests catches ORM mapping bugs and constraint violations that in-memory repos cannot.
+- Jest throughout — no context switching between two test frameworks.
+- BDD structure (`describe` nesting) makes test intent readable without Gherkin ceremony.
+
+### Negative
+- In-memory repositories must be maintained alongside the real adapters. They can drift if the port interface changes and the in-memory impl is not updated. Mitigated by TypeScript — the compiler enforces the interface.
+- Testcontainers requires Docker to be available in CI. Standard in most modern CI environments but worth noting.
