@@ -1,10 +1,10 @@
+import { generateEntityId } from "src/libs/ddd/utils/randomize-entity-id.js";
+import { uuidRegex } from "src/shared/utils/uuid-regex.js";
 import { ZodError } from "zod";
 import { validAddress } from "./customer-address.value-object.spec.js";
 import { validEmailContact, validPhoneContact } from "./customer-contact.value-object.spec.js";
 import { CustomerAggregate } from "./customer.aggregate.js";
 import { CustomerCreatedDomainEvent } from "./events/customer-created.domain-event.js";
-import { generateEntityId } from "src/libs/ddd/utils/randomize-entity-id.js";
-import { uuidRegex } from "src/shared/utils/uuid-regex.js";
 
 describe("CustomerAggregate.create()", () => {
     describe("happy path", () => {
@@ -79,30 +79,96 @@ describe("CustomerAggregate.create()", () => {
             expect(() =>
                 CustomerAggregate.create({
                     name: "Acme Corp",
-                    addresses: [],
+                    addresses: [validAddress()],
                     contacts: [],
                 }),
             ).toThrow(ZodError);
         });
     });
+});
 
-    describe("CustomerAggregate.reconstitute()", () => {
-        it("reconstructs a customer with all properties", () => {
-            const customer = CustomerAggregate.reconstitute({
-                id: generateEntityId("123e4567-e89b-12d3-a456-426614174000"),
+describe("CustomerAggregate.reconstitute()", () => {
+    it("reconstructs a customer with all properties", () => {
+        const customer = CustomerAggregate.reconstitute({
+            id: generateEntityId("123e4567-e89b-12d3-a456-426614174000"),
+            properties: {
+                name: "Acme Corp",
+                description: "Our top distributor",
+                addresses: [validAddress(), validAddress(), validAddress()],
+                contacts: [validEmailContact(), validPhoneContact()],
+            },
+        });
+
+        expect(customer.id).toBe("123e4567-e89b-12d3-a456-426614174000");
+        expect(customer.name).toBe("Acme Corp");
+        expect(customer.description).toBe("Our top distributor");
+        expect(customer.addresses).toHaveLength(3);
+        expect(customer.contacts).toHaveLength(2);
+    });
+
+    it("reconstructs a customer without optional description", () => {
+        const customer = CustomerAggregate.reconstitute({
+            id: generateEntityId("123e4567-e89b-12d3-a456-426614174000"),
+            properties: {
+                name: "Acme Corp",
+                addresses: [validAddress()],
+                contacts: [validEmailContact()],
+            },
+        });
+
+        expect(customer.description).toBeUndefined();
+    });
+
+    it("reconstructs a customer with an empty addresses array", () => {
+        const customer = CustomerAggregate.reconstitute({
+            id: generateEntityId("123e4567-e89b-12d3-a456-426614174000"),
+            properties: {
+                name: "Acme Corp",
+                addresses: [],
+                contacts: [validEmailContact()],
+            },
+        });
+
+        expect(customer.addresses).toHaveLength(0);
+    });
+
+    it("reconstructs a customer with an empty contacts array", () => {
+        const customer = CustomerAggregate.reconstitute({
+            id: generateEntityId("123e4567-e89b-12d3-a456-426614174000"),
+            properties: {
+                name: "Acme Corp",
+                addresses: [validAddress()],
+                contacts: [],
+            },
+        });
+
+        expect(customer.contacts).toHaveLength(0);
+    });
+
+    it("reconstructs a customer with non-uuid id", () => {
+        const customer = CustomerAggregate.reconstitute({
+            id: generateEntityId("123"),
+            properties: {
+                name: "Acme Corp",
+                addresses: [validAddress()],
+                contacts: [validEmailContact()],
+            },
+        });
+
+        expect(customer.id).toBe("123");
+    });
+
+    it("throws when id is not stringified", () => {
+        expect(() =>
+            CustomerAggregate.reconstitute({
+                // @ts-expect-error - for test only
+                id: generateEntityId(123),
                 properties: {
                     name: "Acme Corp",
-                    description: "Our top distributor",
-                    addresses: [validAddress(), validAddress(), validAddress()],
-                    contacts: [validEmailContact(), validPhoneContact()],
+                    addresses: [validAddress()],
+                    contacts: [validEmailContact()],
                 },
-            });
-
-            expect(customer.id).toBe("123e4567-e89b-12d3-a456-426614174000");
-            expect(customer.name).toBe("Acme Corp");
-            expect(customer.description).toBe("Our top distributor");
-            expect(customer.addresses).toHaveLength(3);
-            expect(customer.contacts).toHaveLength(2);
-        });
+            }),
+        ).toThrow();
     });
 });
