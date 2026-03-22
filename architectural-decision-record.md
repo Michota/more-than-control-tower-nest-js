@@ -286,3 +286,37 @@ This eliminates the need for a separately managed test database or Docker Compos
 ### Negative
 - In-memory repositories must be maintained alongside the real adapters. They can drift if the port interface changes and the in-memory impl is not updated. Mitigated by TypeScript — the compiler enforces the interface.
 - Testcontainers requires Docker to be available in CI. Standard in most modern CI environments but worth noting.
+
+
+# ADR-008: Validation of test-only environment variables
+
+**Status:** Unconfirmed — under consideration
+**Date:** 2026-03-22
+
+## Context
+
+Integration tests require environment variables that are meaningless in production — currently `TEST_DB_NAME`, pointing to the test PostgreSQL database. These are read in `src/shared/testing/test-database.module.ts` directly from `process.env` with a manual presence check.
+
+The project already has `src/config/env.ts`, which uses Zod to validate and type all runtime environment variables at application startup. The question is whether test-only variables should go through the same mechanism or be handled separately.
+
+## The tension
+
+**Adding `TEST_DB_NAME` to `env.ts`:**
+- Consistent — one place for all env var validation, one schema to read
+- Typed — `env.TEST_DB_NAME` instead of raw `process.env.TEST_DB_NAME`
+- But: `env.ts` is imported on every application start. Making `TEST_DB_NAME` required there means production deployments must set a variable that serves no purpose in production. Making it optional (`z.string().optional()`) weakens the guarantee that env vars are always present when accessed.
+
+**Keeping test-only variables out of `env.ts`:**
+- Production config stays clean — no test concerns leak into the startup validation
+- Test utilities validate their own vars independently (as `TestDatabaseModule` currently does)
+- But: two separate validation mechanisms for env vars, inconsistent developer experience, no shared Zod schema for test vars
+
+## Open questions
+
+- Should `env.ts` be split into `env.runtime.ts` and `env.test.ts`, each with its own Zod schema, and only the former imported by production code?
+- Or should `env.ts` remain production-only and test utilities always validate their own vars with inline checks?
+- If Testcontainers is adopted (see ADR-007), `TEST_DB_NAME` becomes unnecessary — the container URI is injected programmatically. Does the question become moot?
+
+## Decision
+
+Not yet made.
