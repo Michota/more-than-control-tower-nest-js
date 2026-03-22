@@ -25,6 +25,37 @@ export default tseslint.config(
         },
     },
     {
+        files: ["**/*.ts", "**/*.js"],
+        ignores: ["**/*.spec.ts", "**/*.spec.js"],
+        rules: {
+            "no-restricted-imports": [
+                "error",
+                {
+                    patterns: [
+                        { regex: "\\.spec\\.(ts|js)?$", message: "Production code must not import test files." },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ["**/domain/**/*.ts"],
+        rules: {
+            "no-restricted-imports": [
+                "error",
+                {
+                    patterns: [
+                        {
+                            regex: "^(?:\\.\\./)+(?:database|commands|queries)",
+                            message:
+                                "Domain layer must not import from application or infrastructure layers. Use only /domain, /libs, or /shared.",
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
         rules: {
             "prettier/prettier": ["warn", {}, { usePrettierrc: true }],
             "@typescript-eslint/no-explicit-any": "off",
